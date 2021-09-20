@@ -3,6 +3,8 @@ package com.lucasramon.jpa.ui;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.swing.JOptionPane;
+
 import com.lucasramon.jpa.models.Pessoa;
 import com.lucasramon.jpa.services.impl.PessoaService;
 import com.lucasramon.jpa.services.interfaces.CrudService;
@@ -13,21 +15,20 @@ public class Main {
 	private static Scanner SCANNER = new Scanner(System.in);
 
 	public static void main(String[] args) {
-		listarPessoas();
 		int opcao = 0;
 
 		while (opcao != 6) {
-
-			System.out.println("\n Escolha uma ação: ");
-			System.out.println("1. Listar pessoas");
-			System.out.println("2. Inserir pessoas");
-			System.out.println("3. Atualizar pessoas");
-			System.out.println("4. Excluir pessoas");
-			System.out.println("5.Pesquisar pessoa por nome");
-			System.out.println("6. Sair");
-			System.out.println("\n Sua opcao: ");
-			opcao = SCANNER.nextInt();
-			SCANNER.nextLine();
+		String strOpcao =  JOptionPane.showInputDialog(null, 
+				    "Escolha uma ação:\n"
+					+ "1. Listar pessoas\n"
+					+ "2. Inserir pessoas\n"
+					+ "3. Atualizar pessoas\n"
+					+ "4. Excluir pessoas\n"
+					+ "5.Pesquisar pessoa por nome\n"
+					+ "6. Sair\n"
+					, "MENU", JOptionPane.QUESTION_MESSAGE);
+			
+			opcao = Integer.parseInt(strOpcao);
 			switch (opcao) {
 			case 1:
 				listarPessoas();
@@ -44,96 +45,91 @@ public class Main {
 			case 5:
 				pesquisarPessoaPorNome();
 				break;
+			case 6:
+				opcao=6;
+				break;
 			default:
-				System.out.println("** Opção inválida! **");
+				JOptionPane.showInternalMessageDialog(null, "Opção Invalida", "ATENÇÃO", JOptionPane.WARNING_MESSAGE);
 				break;
 
 			}
 		}
-		System.out.println("Tchau! :");
+		JOptionPane.showInternalMessageDialog(null, "Tchau!!!", "Obrigado", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	private static void pesquisarPessoaPorNome() {
-		System.out.println("\n Pesquisa de pessoa por nome");
-		System.out.println("- Digite o nome a ser pesquisado: ");
-		String nomeASerPesquisado = SCANNER.nextLine();
+		
+		String nomeASerPesquisado = JOptionPane.showInputDialog(null, "Digite o nome a ser pesquisado:", "Pesquisa de pessoa por nome", JOptionPane.QUESTION_MESSAGE);
 		PessoaBuscaPorNome pessoaService = new PessoaService();
 		pessoaService.searchByName(nomeASerPesquisado).forEach(pessoa -> {
-			System.out.println(String.format("- (%d) %s %s - %d anos", pessoa.getId(), pessoa.getNome(),
-					pessoa.getSobrenome(), pessoa.getIdade()));
+			JOptionPane.showInternalMessageDialog(null,String.format("- (%d) %s %s - %d anos", pessoa.getId(), pessoa.getNome(),
+					pessoa.getSobrenome(), pessoa.getIdade()) , "Pessoa Pesquisada", JOptionPane.INFORMATION_MESSAGE);
 		});
 
 	}
 
 	private static void deletarPessoa() {
-		System.out.println("\nRemoção de pessoa");
-		System.out.println("-Digite o ID da pessoa a ser removida: ");
-		int idPessoaASerRemovida = SCANNER.nextInt();
-		SCANNER.nextLine();
+		String strId = JOptionPane.showInputDialog(null,"Digite o id da pessoa." ,"Remoção de pessoa" , JOptionPane.QUESTION_MESSAGE);
+		int idPessoaASerRemovida = Integer.parseInt(strId);
 		CrudService<Pessoa, Integer> pessoaService = new PessoaService();
 		pessoaService.deleteById(idPessoaASerRemovida);
-		System.out.println("Pessoa removida com sucesso!");
+		JOptionPane.showInternalMessageDialog(null, "Pessoa removida com sucesso","Remoção de pessoa" , JOptionPane.INFORMATION_MESSAGE);
 
 	}
 
 	private static void atualizarPessoa() {
-		System.out.println("\nAtualização de pessoa");
-		System.out.println("Digite o ID da pessoa a ser atualizada :");
-		int idPessoa = SCANNER.nextInt();
-		SCANNER.nextLine();
+		String strIdPessoa = JOptionPane.showInputDialog(null, "Digite o id da pessoa a ser atualizada." , "Atualização de pessoa", JOptionPane.QUESTION_MESSAGE);
+		int idPessoa = Integer.parseInt(strIdPessoa);
 		CrudService<Pessoa, Integer> pessoaService = new PessoaService();
 		Pessoa pessoaAtual = pessoaService.byId(idPessoa);
 		if (pessoaAtual != null) {
-			System.out.println("Pessoa encontrada: ");
-			System.out.println(String.format("- Nome: %s", pessoaAtual.getNome()));
-			System.out.println(String.format("- Sobrenome: %s", pessoaAtual.getSobrenome()));
-			System.out.println(String.format("- Sobrenome: %s\n", pessoaAtual.getIdade()));
-			System.out.println("- Novo nome: ");
-			pessoaAtual.setNome(SCANNER.nextLine());
-			System.out.println("- Novo sobrenome: ");
-			pessoaAtual.setSobrenome(SCANNER.nextLine());
-			System.out.println("- Nova idade: ");
-			pessoaAtual.setIdade(SCANNER.nextInt());
+			JOptionPane.showInternalMessageDialog(null,String.format("- Nome: %s\n", pessoaAtual.getNome())+
+					String.format("- Sobrenome: %s\n", pessoaAtual.getSobrenome())+String.format("- Sobrenome: %s\n", pessoaAtual.getIdade())
+					 ,"Atualização de pessoa", JOptionPane.INFORMATION_MESSAGE);
+			
+			pessoaAtual.setNome(JOptionPane.showInputDialog(null, "Digite o novo nome:", "Atualização de pessoa", JOptionPane.QUESTION_MESSAGE)); 
+			pessoaAtual.setSobrenome(JOptionPane.showInputDialog(null, "Digite o novo sobrenome:", "Atualização de pessoa", JOptionPane.QUESTION_MESSAGE));
+			String strIdade = JOptionPane.showInputDialog(null,"Digite a nova idade:" , "Atualização de pessoa", JOptionPane.QUESTION_MESSAGE);
+			pessoaAtual.setIdade(Integer.parseInt(strIdade));
 			pessoaService.update(pessoaAtual);
-			System.out.println("Pessoa atualizada com sucesso!");
+			JOptionPane.showInternalMessageDialog(null,"Pessoa atualizada com sucesso" , "Atualização de pessoa", JOptionPane.INFORMATION_MESSAGE);
 		} else {
-			System.out.println("Não existem pessoas com esse ID");
+			JOptionPane.showInternalMessageDialog(null, "Não existem pessoas com este ID" , "Atualização de pessoa", JOptionPane.INFORMATION_MESSAGE);
 		}
 
 	}
 
 	private static void inserirPessoa() {
-		System.out.println("\n ** Inclusão de pessoa **");
-
 		Pessoa novaPessoa = new Pessoa();
-		System.out.println("Nome: ");
-		novaPessoa.setNome(SCANNER.nextLine());
-		System.out.println("Sobrenome: ");
-		novaPessoa.setSobrenome(SCANNER.nextLine());
-		System.out.println("Idade:");
-		novaPessoa.setIdade(SCANNER.nextInt());
+		novaPessoa.setNome(JOptionPane.showInputDialog(null, "Digite o nome:","Inclusão de pessoa" , JOptionPane.QUESTION_MESSAGE));
+		novaPessoa.setSobrenome(JOptionPane.showInputDialog(null, "Digite o sobrenome:" ,"Inclusão de pessoa", JOptionPane.QUESTION_MESSAGE));
+		novaPessoa.setIdade(Integer.parseInt(JOptionPane.showInputDialog(null,"Digite a idade:" , "Inclusão de pessoa", JOptionPane.QUESTION_MESSAGE)));
 		CrudService<Pessoa, Integer> pessoaService = new PessoaService();
 		Pessoa pessoa = pessoaService.insert(novaPessoa);
-		System.out.println(pessoa.getId());
-		System.out.println("Pessoa inserida com sucesso!");
-
+		
+		//System.out.println(pessoa.getId());
+		JOptionPane.showInternalMessageDialog(null,"Pessoa inserida com sucesso!" , "Inclusão de pessoa", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	private static void listarPessoas() {
 		CrudService<Pessoa, Integer> pessoaService = new PessoaService();
-		System.out.println("**** GERENCIAMENTO DE PESSOAS ****");
-		System.out.println(" > Lista de pessoas cadastradas: \n");
+	
 		try {
+			StringBuilder list = new StringBuilder();
 			List<Pessoa> pessoas = pessoaService.all();
 			pessoas.forEach(pessoa -> {
-				System.out.println(String.format("- (%d) %s %s - %d anos", pessoa.getId(), pessoa.getNome(),
+				list.append(String.format("- (%d) %s %s - %d anos\n", pessoa.getId(), pessoa.getNome(),
 						pessoa.getSobrenome(), pessoa.getIdade()));
 			});
+			
+			JOptionPane.showInternalMessageDialog(null,  list.toString(),"lista de pessoas cadastradas", JOptionPane.INFORMATION_MESSAGE);
+
+			;
 			if (pessoas.isEmpty()) {
-				System.out.println("Não existem pessoas cadastradas.");
+				JOptionPane.showInternalMessageDialog(null, "Não existem pessoas cadastradas." ,"Listas de Pessoas" , JOptionPane.ERROR_MESSAGE);
 			}
 		} catch (Exception e) {
-			System.out.println("Houve um erro ao utilizar a JPA " + e.getMessage());
+			JOptionPane.showInternalMessageDialog(null,"Houve um erro ao utilizar a JPA "+e.getMessage(),  "Listas de Pessoas", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
